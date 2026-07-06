@@ -31,6 +31,25 @@ jobs:
           sed -i "s|__WORKER_URL__|${{ secrets.WORKER_URL }}|g" dist/team_registration.html
           sed -i "s|__WORKER_URL__|${{ secrets.WORKER_URL }}|g" dist/individual_registration.html
 
+      - name: Verify substitution actually worked
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+        run: |
+          echo "WORKER_URL secret length: ${#WORKER_URL} characters"
+          if [ "${#WORKER_URL}" -eq 0 ]; then
+            echo "❌ The WORKER_URL secret is EMPTY. Add it under Settings → Secrets and variables → Actions → Secrets tab."
+            exit 1
+          fi
+          if grep -q "__WORKER_URL__" dist/team_registration.html; then
+            echo "❌ Placeholder still present in team_registration.html after substitution."
+            exit 1
+          fi
+          if grep -q "__WORKER_URL__" dist/individual_registration.html; then
+            echo "❌ Placeholder still present in individual_registration.html after substitution."
+            exit 1
+          fi
+          echo "✅ Substitution succeeded in both files."
+
       - name: Upload build as Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
