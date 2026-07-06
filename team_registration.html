@@ -1,0 +1,302 @@
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; }
+  .wrap { font-family: -apple-system, "Segoe UI", Arial, sans-serif; color:#1f2937; background:#faf7f0; }
+  .banner { background:#14532d; color:#faf7f0; padding:28px 24px 20px; text-align:center; }
+  .banner h1 { margin:0; font-size:22px; letter-spacing:0.5px; font-weight:700; }
+  .banner p { margin:6px 0 0; font-size:13px; color:#cfe3d4; }
+  .courtline { height:10px; background:
+    linear-gradient(#faf7f0,#faf7f0) center/2px 100% no-repeat,
+    #14532d; position:relative; }
+  .courtline::after { content:""; position:absolute; left:0; right:0; top:4px; height:2px; background:#faf7f0; }
+  .card { max-width:640px; margin:-1px auto 32px; background:#ffffff; border:1px solid #e5e0d3; border-radius:10px; padding:24px; }
+  .tabs { display:flex; gap:8px; max-width:640px; margin:20px auto 0; padding:0 16px; }
+  .tab { flex:1; text-align:center; padding:10px; border-radius:8px 8px 0 0; font-size:13px; font-weight:600; cursor:pointer; border:1px solid #e5e0d3; border-bottom:none; background:#f1ede2; color:#6b6a63; }
+  .tab.active { background:#ffffff; color:#14532d; }
+  label { display:block; font-size:12px; font-weight:600; color:#5f5e5a; margin:14px 0 4px; }
+  input[type=text], input[type=number], input[type=tel], select {
+    width:100%; padding:9px 10px; border:1px solid #d3d1c7; border-radius:6px; font-size:14px; font-family:inherit; background:#fff; color:#1f2937;
+  }
+  input:focus, select:focus { outline:2px solid #14532d33; border-color:#14532d; }
+  .section-title { margin:22px 0 4px; font-size:14px; font-weight:700; color:#14532d; border-bottom:2px solid #e5e0d3; padding-bottom:6px; }
+  .hint { font-size:12px; color:#8a887f; margin:2px 0 0; }
+  .player-row { display:grid; grid-template-columns: 28px 1fr 1fr auto; gap:8px; align-items:center; margin-top:8px; }
+  .player-row .num { font-size:12px; color:#8a887f; text-align:center; }
+  .rm-btn { border:none; background:none; color:#c1440e; font-size:18px; cursor:pointer; padding:0 6px; }
+  .add-btn { margin-top:12px; border:1px dashed #14532d; background:none; color:#14532d; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; width:100%; }
+  .submit-btn { margin-top:22px; width:100%; padding:12px; background:#c1440e; color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:700; cursor:pointer; }
+  .submit-btn:disabled { background:#d3b1a0; cursor:not-allowed; }
+  .err { color:#a32d2d; font-size:12px; margin-top:6px; min-height:14px; }
+  .success { text-align:center; padding:20px 0; }
+  .success .id { display:inline-block; margin-top:10px; padding:6px 14px; background:#eaf3de; color:#27500a; border-radius:6px; font-size:13px; font-weight:700; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .admin-login { display:flex; gap:8px; margin-top:10px; }
+  .admin-login input { flex:1; }
+  .admin-login button { padding:9px 16px; background:#14532d; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; }
+  table.reg-table { width:100%; border-collapse:collapse; font-size:12.5px; margin-top:14px; }
+  table.reg-table th, table.reg-table td { border:1px solid #e5e0d3; padding:6px 8px; text-align:left; vertical-align:top; }
+  table.reg-table th { background:#f1ede2; font-weight:700; }
+  .stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+  .stat-card { background:#f1ede2; border-radius:8px; padding:12px; text-align:center; }
+  .stat-card .n { font-size:22px; font-weight:700; color:#14532d; }
+  .stat-card .l { font-size:11px; color:#6b6a63; margin-top:2px; }
+  .csv-btn { margin-top:14px; padding:9px 14px; background:#14532d; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px; }
+  .lock-note { font-size:11px; color:#8a887f; margin-top:8px; }
+  .setup-note { font-size:11px; color:#a32d2d; background:#fcebeb; border-radius:6px; padding:8px 10px; margin:14px 16px 0; max-width:608px; margin-left:auto; margin-right:auto; }
+</style>
+
+<div class="wrap">
+  <div class="banner">
+    <h1>Ceyline Badminton Tournament 2026</h1>
+    <p>8th &amp; 9th August 2026 &middot; St. Joseph's College Colombo</p>
+  </div>
+  <div class="courtline"></div>
+
+  <div id="configWarning" class="setup-note" style="display:none;">
+    Organizer setup needed: paste your Cloudflare Worker URL into the CONFIG line near the top of this file's script before sharing this link.
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-register" onclick="showView('register')">Team registration</div>
+    <div class="tab" id="tab-admin" onclick="showView('admin')">Organizer view</div>
+  </div>
+
+  <div class="card" id="view-register">
+    <div id="form-area">
+      <p class="hint">Register your company's team for the Team Event (2nd August day). A team needs a minimum of 7 and maximum of 10 players, including at least 2 women.</p>
+
+      <label>Company name *</label>
+      <input type="text" id="companyName" placeholder="e.g. Ceyline Shipping Agencies" />
+
+      <div class="section-title">Players</div>
+      <div id="playersWrap"></div>
+      <button class="add-btn" id="addPlayerBtn" onclick="addPlayerRow()">+ Add player</button>
+
+      <div class="section-title">Team contacts</div>
+      <div class="grid2">
+        <div>
+          <label>Captain name</label>
+          <input type="text" id="captainName" placeholder="Full name" />
+        </div>
+        <div>
+          <label>Captain contact number</label>
+          <input type="tel" id="captainPhone" placeholder="07X XXX XXXX" />
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <label>Contact person name</label>
+          <input type="text" id="contactName" placeholder="Full name" />
+        </div>
+        <div>
+          <label>Contact person number</label>
+          <input type="tel" id="contactPhone" placeholder="07X XXX XXXX" />
+        </div>
+      </div>
+
+      <div class="err" id="formErr"></div>
+      <button class="submit-btn" id="submitBtn" onclick="submitTeam()">Submit team registration</button>
+    </div>
+
+    <div class="success" id="successArea" style="display:none;">
+      <div style="font-size:36px;">&#10003;</div>
+      <p style="font-weight:700; font-size:16px; margin:6px 0 0;">Team registered</p>
+      <p class="hint" id="successCompany"></p>
+      <div class="id" id="successId"></div>
+      <p class="hint" style="margin-top:14px;">Save this reference in case you need to make changes later. Contact the organizers to amend an entry.</p>
+      <button class="add-btn" style="margin-top:16px;" onclick="resetForm()">Register another team</button>
+    </div>
+  </div>
+
+  <div class="card" id="view-admin" style="display:none;">
+    <div id="adminLoginArea">
+      <label>Organizer password</label>
+      <div class="admin-login">
+        <input type="text" id="adminPw" placeholder="Enter password" onkeydown="if(event.key==='Enter') adminLogin()"/>
+        <button onclick="adminLogin()">View entries</button>
+      </div>
+      <div class="err" id="adminErr"></div>
+      <p class="lock-note">This password only hides the view in this page. Your JSONBin key itself is safely hidden in the Cloudflare Worker and is never visible in this page's source.</p>
+    </div>
+    <div id="adminDataArea" style="display:none;">
+      <div class="stat-row" id="statRow"></div>
+      <button class="csv-btn" onclick="downloadCsv()">Download CSV</button>
+      <div style="overflow-x:auto;">
+        <table class="reg-table" id="adminTable"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====================== CONFIG - edit this one line ====================== */
+const WORKER_URL = "__WORKER_URL__"; // Replaced automatically by GitHub Actions at deploy time - do not edit by hand
+const ADMIN_PASSWORD = "ceyline2026#&";
+/* =========================================================================== */
+let playerCount = 0;
+let allRecords = [];
+
+if (WORKER_URL.indexOf("__WORKER_URL__") === 0) {
+  document.getElementById('configWarning').style.display = 'block';
+}
+
+function addPlayerRow(name, nic) {
+  if (playerCount >= 10) return;
+  playerCount++;
+  const wrap = document.getElementById('playersWrap');
+  const row = document.createElement('div');
+  row.className = 'player-row';
+  row.id = 'prow-' + playerCount;
+  row.innerHTML =
+    '<div class="num">' + playerCount + '</div>' +
+    '<input type="text" placeholder="Full name (with familiar name)" class="pname" value="' + (name||'') + '" />' +
+    '<input type="text" placeholder="NIC no." class="pnic" value="' + (nic||'') + '" />' +
+    '<button class="rm-btn" aria-label="Remove player" onclick="removeRow(this)">&times;</button>';
+  wrap.appendChild(row);
+  document.getElementById('addPlayerBtn').style.display = playerCount >= 10 ? 'none' : 'block';
+}
+
+function removeRow(btn) {
+  btn.closest('.player-row').remove();
+  renumberRows();
+}
+
+function renumberRows() {
+  const rows = document.querySelectorAll('#playersWrap .player-row');
+  playerCount = rows.length;
+  rows.forEach((r, i) => { r.querySelector('.num').textContent = i + 1; });
+  document.getElementById('addPlayerBtn').style.display = playerCount >= 10 ? 'none' : 'block';
+}
+
+for (let i = 0; i < 7; i++) addPlayerRow();
+
+function showView(v) {
+  document.getElementById('view-register').style.display = v === 'register' ? 'block' : 'none';
+  document.getElementById('view-admin').style.display = v === 'admin' ? 'block' : 'none';
+  document.getElementById('tab-register').classList.toggle('active', v === 'register');
+  document.getElementById('tab-admin').classList.toggle('active', v === 'admin');
+}
+
+async function submitTeam() {
+  const err = document.getElementById('formErr');
+  err.textContent = '';
+  const company = document.getElementById('companyName').value.trim();
+  const players = [...document.querySelectorAll('#playersWrap .player-row')].map(r => ({
+    name: r.querySelector('.pname').value.trim(),
+    nic: r.querySelector('.pnic').value.trim()
+  })).filter(p => p.name);
+
+  if (!company) { err.textContent = 'Please enter the company name.'; return; }
+  if (players.length < 7) { err.textContent = 'Please enter at least 7 players.'; return; }
+
+  const id = 'T-' + Date.now().toString(36).toUpperCase();
+  const record = {
+    type: 'team',
+    id,
+    company,
+    players,
+    captainName: document.getElementById('captainName').value.trim(),
+    captainPhone: document.getElementById('captainPhone').value.trim(),
+    contactName: document.getElementById('contactName').value.trim(),
+    contactPhone: document.getElementById('contactPhone').value.trim(),
+    submittedAt: new Date().toISOString()
+  };
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  try {
+    const res = await fetch(WORKER_URL + '/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'team', record })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('successArea').style.display = 'block';
+    document.getElementById('successCompany').textContent = company + ' \u2014 ' + players.length + ' players';
+    document.getElementById('successId').textContent = id;
+  } catch (e) {
+    err.textContent = 'Could not save your registration. Please check your connection and try again.';
+    btn.disabled = false; btn.textContent = 'Submit team registration';
+  }
+}
+
+function resetForm() {
+  document.getElementById('companyName').value = '';
+  document.getElementById('captainName').value = '';
+  document.getElementById('captainPhone').value = '';
+  document.getElementById('contactName').value = '';
+  document.getElementById('contactPhone').value = '';
+  document.getElementById('playersWrap').innerHTML = '';
+  playerCount = 0;
+  for (let i = 0; i < 7; i++) addPlayerRow();
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Submit team registration';
+  document.getElementById('successArea').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+}
+
+async function adminLogin() {
+  const pw = document.getElementById('adminPw').value;
+  const errEl = document.getElementById('adminErr');
+  if (pw !== ADMIN_PASSWORD) { errEl.textContent = 'Incorrect password.'; return; }
+  errEl.textContent = '';
+  document.getElementById('adminLoginArea').style.display = 'none';
+  document.getElementById('adminDataArea').style.display = 'block';
+  await loadAdminData();
+}
+
+async function loadAdminData() {
+  const table = document.getElementById('adminTable');
+  table.innerHTML = '<tr><td>Loading entries...</td></tr>';
+  allRecords = [];
+  try {
+    const res = await fetch(WORKER_URL + '/list?type=team');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    allRecords = await res.json();
+    renderAdminTable();
+  } catch (e) {
+    table.innerHTML = '<tr><td>Could not load entries. Check the Worker URL in CONFIG.</td></tr>';
+  }
+}
+
+function renderAdminTable() {
+  const totalTeams = allRecords.length;
+  const totalPlayers = allRecords.reduce((s, r) => s + r.players.length, 0);
+  document.getElementById('statRow').innerHTML =
+    '<div class="stat-card"><div class="n">' + totalTeams + '</div><div class="l">Teams registered</div></div>' +
+    '<div class="stat-card"><div class="n">' + totalPlayers + '</div><div class="l">Total players</div></div>' +
+    '<div class="stat-card"><div class="n">' + (totalTeams ? Math.round(totalPlayers / totalTeams * 10) / 10 : 0) + '</div><div class="l">Avg players / team</div></div>';
+
+  let html = '<tr><th>Company</th><th>Players</th><th>Captain</th><th>Contact person</th><th>Submitted</th></tr>';
+  allRecords
+    .sort((a, b) => a.submittedAt.localeCompare(b.submittedAt))
+    .forEach(r => {
+      html += '<tr><td>' + esc(r.company) + '</td><td>' +
+        r.players.map(p => esc(p.name) + (p.nic ? ' (' + esc(p.nic) + ')' : '')).join('<br>') +
+        '</td><td>' + esc(r.captainName) + (r.captainPhone ? '<br>' + esc(r.captainPhone) : '') + '</td><td>' +
+        esc(r.contactName) + (r.contactPhone ? '<br>' + esc(r.contactPhone) : '') + '</td><td>' +
+        new Date(r.submittedAt).toLocaleString() + '</td></tr>';
+    });
+  document.getElementById('adminTable').innerHTML = html;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+function downloadCsv() {
+  let rows = [['Company','Player name','NIC','Captain','Captain phone','Contact person','Contact phone','Submitted at']];
+  allRecords.forEach(r => {
+    r.players.forEach(p => {
+      rows.push([r.company, p.name, p.nic, r.captainName, r.captainPhone, r.contactName, r.contactPhone, r.submittedAt]);
+    });
+  });
+  const csv = rows.map(row => row.map(v => '"' + String(v||'').replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ceyline_team_registrations.csv';
+  a.click();
+}
+</script>
